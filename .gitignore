@@ -1,0 +1,7 @@
+
+# dependencies
+node_modules/
+
+# misc
+ServiceAccount.json
+package-lock.json
