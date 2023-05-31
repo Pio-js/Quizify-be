@@ -1,42 +1,34 @@
 const express = require('express');
 const cors = require('cors');
 const auth = require('./src/middleware/index');
+const { getFirestore } = require('firebase-admin/firestore');
 
 const app = express();
 const port = 5000;
 
 app.use(cors());
+app.use(express.json());
 
-//app.use(middleware.decodeToken);
+const db = getFirestore();
 
 app.get('/', auth.protect, (req,res) => {
     res.send('Hello World');
 })
 
-app.get('/api/quizzes', (req, res) => {
+app.get('/api/quizzes', async (req, res, next) => {
 
-	return res.json({
-		quizzes: [
-			{
-				title: 'Quiz1',
-				category: 'Cities',
-				questions: {
-					question1: 'How many people live in Berlin?',
-					correctAnswer: '3,5 millions',
-					answers: ['1 million', '2 millions', '4 millions', '8 millions']
-				}
-			},
-			{
-				title: 'Quiz2',
-				category: 'Cities',
-				questions: {
-					question1: 'How many people live in London?',
-					correctAnswer: '8 millions',
-					answers: ['1 million', '2 millions', '4 millions', '8 millions']
-				}
-			},
-		],
-	});
+	try {
+		const quizzes = db.collection('quizzes');
+		const response = await quizzes.get();
+		let responseArr = [];
+		response.forEach(doc => {
+			responseArr.push(doc.data())
+		})
+		res.send(responseArr);
+	}
+	catch (error) {
+		res.status(400).send(error.message);
+	}
 });
 
 app.listen(port, () => {
