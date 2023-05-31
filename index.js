@@ -11,11 +11,7 @@ app.use(express.json());
 
 const db = getFirestore();
 
-app.get('/', auth.protect, (req,res) => {
-    res.send('Hello World');
-})
-
-app.get('/api/quizzes', async (req, res, next) => {
+app.get('/', async (req, res, next) => {
 
 	try {
 		const quizzes = db.collection('quizzes');
